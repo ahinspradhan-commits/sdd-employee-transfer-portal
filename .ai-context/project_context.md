@@ -27,7 +27,9 @@ This project is being built as a training/certification exercise in the INT Spec
 - Because there is no real business sponsor, business-level open questions (BRD.md §20, "Business decisions") will generally need to be resolved by you (acting as both engineer and stakeholder) rather than an external approver — but they must still be resolved explicitly and recorded, not silently assumed.
 
 ## Current State
-Discovery (Deliverable 1) is complete and captured in `BRD.md`. Awaiting explicit approval before Spec drafting starts.
+Discovery (Deliverable 1) is complete and captured in `BRD.md`. Spec drafting has happened (4 slices, all Draft — see `specs/spec-slice-map.md`).
+
+> **ACTION REQUIRED — Project Owner (Ahin Subhra Pradhan):** Gate 1 Reviewer (Sourav Kumar Maity) completed a manual Gate 1 review on 2026-09-15. Recommendation: **Rework Required Before Approval** on all 4 active spec slices. Full findings: `reviews/GATE1-BRD-001-2026-09-15.md`. Summary: unresolved business decisions (manager approval ownership, eligibility, Payroll/IT/Facilities triggering, sequencing, rejection, cancellation, concurrent requests) must not be silently encoded as assumptions/spec behavior; add explicit BRD→Spec→AC→Test traceability; define the request lifecycle/state model only once workflow is confirmed; distinguish BRD-stated requirements from discovery-inferred rules; keep external integration scope TBD, not Out of Scope; define API/error contracts once workflow is finalized; convert security considerations into testable requirements. See `status.md` Gate 1 Status column and Daily Execution Log (2026-09-15 entry) for tracking.
 
 ## SDD Governance & Accountability
 
