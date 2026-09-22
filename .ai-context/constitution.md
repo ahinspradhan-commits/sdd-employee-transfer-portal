@@ -1,32 +1,42 @@
-# Project Constitution — Employee Internal Transfer (One-Point Employee Portal)
+# Project Constitution — Employee Internal Transfer
 
-**Status:** Draft v0.1 — pending your review/approval before Spec drafting begins (constitution changes get the same review rigor as a spec — INT SDD Blueprint §8).
+**Status:** Proposed v1.0 — approve before Gate 1.
 
-These are the non-negotiables for every feature built in this project. If a plan later violates or is silent on one of these, that's a Gate 1 finding, not a Gate 2 comment. Projects may add stricter rules later; nothing here should be weakened without a recorded amendment.
+The Constitution contains engineering constraints. It must not silently decide business workflow behaviour that belongs in the BRD/business-decision register.
 
-## Testing Discipline
-- Test-first is mandatory for every state-changing operation (request submission, status/state transitions, any stakeholder action) — no exception for "simple" endpoints.
-- Backend tests: PHPUnit.
-- Minimum coverage floor: 70% line coverage for the transfer-request module. Coverage is a floor, not a target to write to. *(Draft value — adjust if the assignment expects a different bar.)*
-- Core workflow/state-transition tests run against a real local MySQL test database (or a transaction that rolls back), not a mocked database — schema and query-level issues must be caught by tests, not discovered later.
+## 1. Technology
+- Backend: PHP.
+- Database: MySQL.
+- Development environment: localhost/XAMPP.
+- Automated tests: PHPUnit.
+- Existing One-Point Portal authentication is reused; no parallel authentication mechanism is introduced.
 
-## Security Posture
-- No PII (employee name, personal contact details, payroll/payment data) appears in logs at any log level, including debug.
-- Each stakeholder view (Manager/HR/Payroll/IT/Facilities) must only return requests routed to that stakeholder — enforced at the query/data-access layer, not only hidden in the UI.
-- Every state-changing endpoint requires an authenticated session (reusing the Portal's existing login) — no anonymous mutation endpoints.
-- All SQL access uses parameterized queries/prepared statements — no string-concatenated SQL, anywhere.
-- No secrets or DB credentials committed to the repository, even for the localhost environment — use a config file excluded from version control.
+## 2. Testing Discipline
+- Test-first is mandatory for every state-changing operation.
+- A corresponding automated test must exist and demonstrate RED before implementation of that behaviour.
+- Core workflow/state-transition tests use a real local MySQL test database or an equivalent rollback-isolated database transaction.
+- Minimum coverage floor: 70% line coverage for the transfer module.
 
-## Architectural Constraints
-- Approved datastore: MySQL only (system of record). No new datastore introduced without an ADR.
-- Default orchestration model: downstream Manager/HR/Payroll/IT/Facilities steps are tracked as internal task/queue records inside this project's own MySQL schema — not real external system integration — until Decision T1 (BRD.md §20) says otherwise. Changing this later requires an ADR.
-- Authentication: the existing One-Point Portal's login is assumed to be session-based and reusable (Assumption A1, BRD.md). No new/parallel auth mechanism is introduced without an ADR — but the exact integration shape (how this feature's endpoints plug into that session) is Technical Decision T4 (BRD.md §20) and remains open, not resolved by this line.
-- The Internal Transfer feature's code and tables stay clearly separated from unrelated Portal modules (payroll self-service, IT self-service, etc.) it sits alongside — it's an addition, not a rewrite of the existing portal.
+## 3. Security
+- Every state-changing endpoint requires an authenticated session.
+- Request/task access must be enforced at the data-access/query layer, not only in the UI.
+- SQL uses prepared/parameterized statements only.
+- No secrets or credentials are committed.
+- No employee PII appears in logs.
+- Authorization is deny-by-default.
 
-## Non-Functional Baselines
-- No formal SLA — this is a localhost training build, single-developer environment. Working default: list/detail pages render in under 1 second locally.
-- No availability/RPO/RTO target set (not applicable to a local dev environment).
-- *(These are placeholders because the source BRD stated no non-functional requirements — revisit if the assignment expects production-style NFRs.)*
+## 4. Architecture
+- MySQL is the only system-of-record datastore for this assessment.
+- No additional datastore is introduced without an ADR.
+- External HR/Payroll/IT/Facilities integration is not technically assumed. Whether the business requires such integration is governed by the BRD and Business Decision Register.
+- Internal task records may be used only after the business workflow is approved.
+- Feature code and tables remain isolated from unrelated portal modules.
 
-## Versioning Rules
-- No public/external API is in scope by default (per the internal-orchestration assumption above). If any endpoint is later exposed for external integration, it must be versioned under a `/api/v1/` prefix and documented with a breaking-change policy at that time.
+## 5. API
+- Internal application endpoints may use the project's existing routing convention.
+- If a public/external API is introduced, it must be versioned and documented.
+
+## 6. Change Control
+- A business decision changes the BRD/decision register first, then affected specs.
+- A technical design decision is recorded as an ADR.
+- No implementation task may begin until the relevant spec has passed Gate 1.
