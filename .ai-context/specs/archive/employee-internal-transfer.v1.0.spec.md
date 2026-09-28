@@ -1,5 +1,7 @@
 # Spec: Employee Internal Transfer Request
 
+> **ARCHIVED (2026-09-28).** Superseded by the v2.0 slices indexed in `../spec-slice-map.md`. Kept for history only; not normative.
+
 ## Spec ID
 employee-internal-transfer
 

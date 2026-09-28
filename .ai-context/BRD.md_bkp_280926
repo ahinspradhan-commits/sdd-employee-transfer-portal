@@ -5,8 +5,7 @@
 **Feature:** Employee Internal Transfer Digital Journey  
 **System:** One-Point Employee Portal  
 **Source:** SDD Developer Assessment — Employee Internal Transfer Digital Journey  
-**Status:** Accepted as business discovery baseline, subject to clarifications (`reviews/GATE1-BRD-002-2026-09-28.md`). This is not approval of the Feature Specification.  
-**Version:** v2.1 (2026-09-28): follow-up actions G1R2-FA-01, -02 and -05 incorporated; see §21 Change Log  
+**Status:** Revised after BRD Gate 1 review  
 **Feature slug:** `employee-internal-transfer`
 
 ---
@@ -231,13 +230,6 @@ The following must not be converted into specification rules until a business/pr
 | BD-012 | Are notifications required, and at which business events? | Determines communication requirements | Yes |
 | BD-013 | Which employee types are eligible? | Determines scope | Yes |
 | BD-014 | What turnaround/SLA expectations apply to stakeholders? | Determines operational expectations | No |
-| BD-015 | Which request status values does the employee see, and what counts as "completion"? (§6 Stage 6, §13) | Determines status model, completion confirmation and terminal states | Yes |
-| BD-016 | What business validation applies to proposed department/location/role (for example, may a value equal the current one; may inactive values be chosen; business limit on reason length)? (§12) | Determines submission validation beyond data-format checks | Yes |
-| BD-017 | Beyond the requesting employee, who may view a request, and who may act on each stakeholder action? (§15) | Determines stakeholder visibility and action authority | Yes |
-| BD-018 | Is an audit trail of request and stakeholder activity a business or compliance requirement, and what must it retain? (§15) | Determines audit scope and retention | No (does not block baseline submission or tracking) |
-| BD-019 | Does "orchestrate downstream activities" require real integration with HR/Payroll/IT/Facilities systems, or portal-based tracking of stakeholder actions? (§10 TD-001, §18) | Determines integration scope; TD-001 cannot be decided until this is closed | Yes |
-
-Owners, confirmation status and history for every decision are tracked in `decisions/business-decision-register.md`. That register is the authoritative record; this table lists the questions only.
 
 ---
 
@@ -271,18 +263,6 @@ Assumptions are explicitly separated from confirmed requirements.
 | A-001 | The One-Point Employee Portal already exists and provides authenticated employee access. | Authentication and portal scope change | Yes |
 | A-002 | Existing employee organisational information is available to support the journey. | Additional data source/integration may be required | Yes |
 | A-003 | Department, location and role/job-position data are available from an existing source. | Master-data scope may increase | Yes |
-
-### 11.1 Assumption Validation Tracker (Gate 1 follow-up G1R2-FA-02)
-
-These assumptions must be validated **before the Technical Plan is finalised**. Until then, specification items that depend on them are marked "Depends on A-00x".
-
-| ID | What must be established | Validation method | Owner | Blocks | Status |
-|---|---|---|---|---|---|
-| A-001 | How the portal authenticates employees (session mechanism, how the current user's employee identifier is obtained, CSRF convention for state-changing requests) | Inspect portal auth module/docs; confirm with portal technical owner | Project Owner (Ahin Subhra Pradhan) with Portal technical owner (TBD) | TD-002; all `SEC-*` authentication requirements; Plan | Open — not yet validated |
-| A-002 | Where the employee's current department, location, role and manager are held, and whether they are readable by this feature | Inspect portal employee/profile data model; confirm with HR data owner | Project Owner with HR data owner (TBD) | BD-001 routing inputs, BD-016 "same as current" checks, TD-004 | Open — not yet validated |
-| A-003 | Source, identifiers and active/inactive semantics of department/business unit, location and role/job-position master data | Inspect existing master tables/APIs; confirm with master-data owner | Project Owner with master-data owner (TBD) | `SUB-SR-03` reference validation, BD-016, TD-004 | Open — not yet validated |
-
-Validation outcome is recorded here (date, evidence, result). If an assumption is **false**, the BRD is revised first. For example, if master data does not exist, it may become a new scope item.
 
 The following assumptions from the previous BRD have been removed because they prematurely decide business behaviour:
 
@@ -360,33 +340,16 @@ Therefore notification requirements remain an open business decision.
 
 ## 15. Security and Access — Requirement Boundary
 
-The source does not provide detailed security requirements. This section separates **what the business permits** (business authorization rules, owned by the business) from **how the system enforces it** (technical access control, owned by engineering). This addresses Gate 1 follow-up G1R2-FA-01.
+The source does not provide detailed security requirements.
 
-### 15.1 Business Authorization Rules (who may see / do what — business-owned)
+The following are therefore discovery concerns rather than confirmed BRD requirements:
 
-Written in business language. They say nothing about sessions, queries or HTTP codes.
+- employees must not see another employee's request;
+- stakeholders should only access requests assigned/relevant to them;
+- actions should be attributable to an authenticated user;
+- transfer activity may require an audit trail.
 
-| ID | Business authorization rule | Basis | Status |
-|---|---|---|---|
-| BAR-001 | An employee may initiate a transfer request only for themselves. | Source §3: "An employee should be able to initiate…" (RULE-001) | Derived from source — confirm with BD-017 owner |
-| BAR-002 | An employee may view the status and pending actions of their own transfer requests. | Source §3: "View the current status of the request" (BR-008, BR-009) | Derived from source — confirm with BD-017 owner |
-| BAR-003 | An employee may not view another employee's transfer request. | Discovery concern; not stated in source | Proposed — requires BD-017 confirmation |
-| BAR-004 | A stakeholder (Manager, HR, Payroll, IT, Facilities) may view a transfer request only where they are involved in it. The meaning of "involved" is undefined. | Discovery concern; depends on routing | Blocked — BD-001, BD-004..006, BD-017 |
-| BAR-005 | Only the stakeholder responsible for a pending action may record its outcome. The requesting employee may not record outcomes on their own request. | Discovery concern; source separates employee and stakeholder responsibilities (§4) | Proposed — requires BD-017 confirmation; "responsible" is blocked by BD-001, BD-004..006 |
-| BAR-006 | Every stakeholder outcome is attributable to the person who recorded it. | Discovery concern | Proposed — requires BD-018 confirmation |
-
-### 15.2 Technical Access-Control Implementation (how it is enforced — engineering-owned)
-
-These are **not** business rules. They come from `constitution.md` §3 and apply whatever the business decides on BD-017:
-
-- the existing portal session authenticates every request (TD-002, A-001);
-- authorization is **deny-by-default**: until a BAR is confirmed, the only access granted is what the confirmed or derived rules allow;
-- access scoping is enforced in the data-access/query layer, not only in the UI;
-- role-to-permission mapping is a technical decision (TD-003);
-- audit logging mechanics are technical (TD-009), and audit **content and retention** are business-owned (BD-018);
-- no employee PII appears in application logs.
-
-The Feature Specification expresses these controls as `SEC-*` requirements. Each one traces back to a BAR or to the Constitution in `traceability.md`.
+These should be validated and then converted into explicit security requirements before implementation.
 
 ---
 
@@ -504,16 +467,3 @@ The following require explicit business-owner decisions:
 No unresolved business decision should be silently converted into a technical implementation rule, acceptance criterion, API behaviour, status value, or database constraint.
 
 Once the blocking business decisions are confirmed, the approved BRD becomes the source for the Feature Specification, Acceptance Criteria, API Contract and Spec-Derived Test Cases.
-
-### Gate 1 outcome (2026-09-28)
-
-The BRD is accepted as the business discovery baseline, subject to follow-up actions G1R2-FA-01..05 (`reviews/GATE1-BRD-002-2026-09-28.md`). The Feature Specification is re-baselined against the confirmed scope above. Workflow-dependent items stay **Blocked** on the decisions in §9 until each decision is confirmed in the Business Decision Register.
-
----
-
-## 21. Change Log
-
-| Version | Date | Change | Trigger |
-|---|---|---|---|
-| v2.0 | 2026-09-16 | Revised after first Gate 1 review: removed premature assumptions; separated business and technical decisions; kept integration scope open | GATE1-BRD-001-2026-09-15 |
-| v2.1 | 2026-09-28 | Added BD-015..BD-019 (status/completion, proposed-value validation, authorization, audit, integration scope); added assumption validation tracker §11.1; split §15 into business authorization rules (BAR-001..006) and technical access-control implementation | GATE1-BRD-002-2026-09-28 (FA-01, FA-02, FA-05) |

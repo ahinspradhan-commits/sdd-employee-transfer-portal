@@ -1,100 +1,149 @@
-# Spec Slice Map
+# Feature Specification Index — Employee Internal Transfer (Spec Slice Map)
 
-## Parent Feature
-Employee Internal Transfer Request (One-Point Employee Portal)
-
-## Source Spec
-`.ai-context/specs/employee-internal-transfer.spec.md` (Draft v1.0 — Ready for Gate 1 Peer Review, monolithic). This spec is superseded by the slices below and is retained as historical/reference input, per the constitution's "deprecated specs are archived, not deleted" convention — it is not deleted, and its slug does not get reused.
-
-## BRD References
-BRD.md#BRD-001 (FR1–FR10, AC1–AC9, all sections of the Discovery Analysis)
-
-## Naming Convention Note
-Following the convention already established in this workspace (Spec ID = feature slug, e.g. the source spec's `## Spec ID` = `employee-internal-transfer`), each slice's Spec ID is its own slug — there is no separate numeric `SPEC-NNN` identifier. The `Sequence` column below expresses build/read order.
-
-## Slice Sequence
-
-| Sequence | Spec ID (slug) | Business Outcome | Depends On | Produces |
-|---|---|---|---|---|
-| 01 | `employee-transfer-request-submission` | Employee captures and submits a new transfer request | — (entry point) | A Transfer Request record, Status = "Submitted" |
-| 02 | `employee-transfer-stakeholder-orchestration` | On submission, one pending task per stakeholder group is generated | 01 | 5 pending Stakeholder Task records against the request |
-| 03 | `employee-transfer-status-tracking` | Employee views a request's live status and which stakeholders are still pending | 01, 02 (reads outcomes of 04 at runtime) | Read-only status/detail/list views |
-| 04 | `employee-transfer-stakeholder-task-management` | Stakeholder views and completes their own pending task | 02 | Task state transitions (Pending → Completed), consumed by 03 |
-
-## Process Flow
-
-```text
-BRD-001
-  |
-  v
-employee-transfer-request-submission (01)
-  |
-  v
-employee-transfer-stakeholder-orchestration (02)
-  |
-  +-------------------------------+
-  |                                |
-  v                                v
-employee-transfer-status-tracking (03)   employee-transfer-stakeholder-task-management (04)
-  ^                                          |
-  |                                          |
-  +---------- reads task-state updates ------+
-```
-
-03 and 04 both depend on 02 having generated the stakeholder tasks. 03 is a pure read path; 04 is the only spec that mutates task state. 03's `pending_stakeholders` output is only accurate once 04 has run for a given task — this is a **runtime data dependency**, not a build-sequence dependency: 03 and 04 can be implemented and reviewed independently, in either order, since neither one's contract depends on the other's implementation, only on Spec 02's data model.
-
-## Cross-Spec Requirements
-
-### CSR-001 — Authenticated session required
-Every endpoint in every slice requires an authenticated Portal session (constitution.md, Security Posture: "Every state-changing endpoint requires an authenticated session"). Applicable to all four specs; each spec's own 401 exception row is the local expression of this rule, not a duplicate requirement.
-
-### CSR-002 — Per-caller access scoping
-No request or task data is disclosed to a caller who is neither the owning employee nor an assigned stakeholder for that specific request/task (constitution.md, Security Posture: "each stakeholder view must only return requests routed to that stakeholder"). Expressed locally as:
-- `employee-transfer-status-tracking.AC3` (view access)
-- `employee-transfer-stakeholder-task-management.AC2` (act access)
-
-## Shared Requirements
-- **Stakeholder Task** is a data entity introduced by `employee-transfer-stakeholder-orchestration` (02) and is read/written by `employee-transfer-status-tracking` (03, read-only) and `employee-transfer-stakeholder-task-management` (04, read/write). It is not redefined in each spec — 03 and 04 both reference 02's Data Requirements section rather than restating the entity shape.
-- **Business Decisions B1–B10** (BRD.md §20) are carried forward, each attached only to the slice(s) they actually affect — see Requirements Coverage below and each slice's own Risks / Open Decisions section. They are not restated in every slice.
-
-## Requirements Coverage
-
-| Original Requirement / AC | New Spec | New AC ID(s) |
-|---|---|---|
-| FR1–FR7: initiate, capture dept/location/role/date/reason, submit | `employee-transfer-request-submission` | AC1, AC2, AC3 |
-| Original AC1 — required fields + optional reason | `employee-transfer-request-submission` | AC1 |
-| Original AC2 — validation error on missing required field | `employee-transfer-request-submission` | AC2 |
-| Original AC3 — reason persisted and returned | `employee-transfer-request-submission` | AC3 |
-| FR10: portal orchestrates downstream Manager/HR/Payroll/IT/Facilities activity | `employee-transfer-stakeholder-orchestration` | AC1 |
-| Original AC4 — freshly submitted request has Status "Submitted" and all 5 stakeholders pending | `employee-transfer-stakeholder-orchestration` | AC1 |
-| FR8: employee views current status | `employee-transfer-status-tracking` | AC1, AC2 |
-| FR9: employee sees which stakeholder(s) pending | `employee-transfer-status-tracking` | AC1 |
-| Original AC5 — pending_stakeholders reflects partial completion | `employee-transfer-status-tracking` | AC1 |
-| Original AC7 — overall status reflects full completion | `employee-transfer-status-tracking` | AC2 |
-| Original AC8 (view half) — 403, no data disclosed to unrelated caller viewing | `employee-transfer-status-tracking` | AC3 |
-| Original AC6 — assigned stakeholder completes own task | `employee-transfer-stakeholder-task-management` | AC1 |
-| Original AC8 (act half) — 403 when caller isn't the assigned stakeholder | `employee-transfer-stakeholder-task-management` | AC2 |
-| Original AC9 — 409 on completing an already-completed task | `employee-transfer-stakeholder-task-management` | AC3 |
-
-### Correction made during slicing (not a new requirement)
-The source spec's Unit Test Cases table mapped **UT08** ("Non-assigned stakeholder calls complete on someone else's task → 403") to **AC6**, even though that scenario is an access-control case matching the intent of the source spec's **AC8** ("neither the owning employee nor an assigned stakeholder... returns 403"), not AC6 ("assigned stakeholder calls complete"). This slicing resolves the mismatch by giving the access-control scenario its own AC (`employee-transfer-stakeholder-task-management.AC2`) and mapping the equivalent test there (`employee-transfer-stakeholder-task-management.UT02`). No behavior was invented — this is a traceability fix, carried forward for Gate 1 to confirm.
-
-### Unmapped Requirements
-None. All nine original Acceptance Criteria, all five original API endpoints, and all eleven original Unit Test Cases are accounted for above.
-
-### Business Decisions (BRD.md §20, B1–B10) — attached per affected slice
-| ID | Decision | Attached To |
-|---|---|---|
-| B1 | HR eligibility rules | `employee-transfer-request-submission` (Risks) |
-| B2 | Which manager(s) confirm | `employee-transfer-stakeholder-orchestration` (Risks) |
-| B3 | Conditional Payroll/IT/Facilities triggering | `employee-transfer-stakeholder-orchestration` (Risks) |
-| B4 | Approval sequencing | `employee-transfer-stakeholder-orchestration` (Risks) |
-| B5 | Cancellation/withdrawal policy | `employee-transfer-request-submission` (Out of Scope) |
-| B6 | Rejection handling policy | `employee-transfer-stakeholder-task-management` (Out of Scope) |
-| B7 | Concurrent-request policy | `employee-transfer-request-submission` (Out of Scope) |
-| B8 | Minimum lead time for effective date | `employee-transfer-request-submission` (Out of Scope) |
-| B9 | Notification requirements | `employee-transfer-status-tracking` (Out of Scope) |
-| B10 | Employee-type scope | `employee-transfer-request-submission` (Out of Scope) |
+## Version
+v2.0 (2026-09-28): re-baselined against BRD-001 v2.1 after Gate 1 review GATE1-BRD-002-2026-09-28. Supersedes v1.0 of this map and v1.0 of all four slices.
 
 ## Status
-All four slices are **Draft**, not Approved. They enter Gate 1 individually and independently.
+**Ready for Gate 1 specification review.** Not approved.
+
+## Governance
+
+| Role | Name |
+|---|---|
+| Project Owner | Ahin Subhra Pradhan |
+| Gate 1 Reviewer | Sourav Kumar Maity |
+| Gate 2 Reviewer | TBD. Must be independent of the implementer (status.md governance correction) |
+
+## Parent Feature
+Employee Internal Transfer Digital Journey (One-Point Employee Portal). BRD: `.ai-context/BRD.md#BRD-001` (v2.1).
+
+The monolithic v1.0 spec and the v1.0 task-management slice are archived in `specs/archive/` (historical, not normative).
+
+---
+
+## 1. How to Read These Specs
+
+### 1.1 Requirement classification
+Every spec requirement (SR), acceptance criterion (AC), state transition, API behaviour and test carries one of these tags:
+
+| Tag | Meaning | Implementable? |
+|---|---|---|
+| **Baseline** | Traceable to a confirmed BRD requirement/rule (BR-xxx, RULE-xxx), a source-derived business authorization rule, or an engineering constraint in `constitution.md` | Yes, after spec Gate 1 approval |
+| **Blocked (BD-xxx)** | Depends on an unconfirmed business decision. The **Proposed option** in the register is **not** used as the requirement. | No |
+| **Depends on A-00x** | Baseline in intent, but the details depend on an assumption not yet validated (BRD §11.1) | Only after the assumption is validated |
+| **Reserved** | A placeholder so the contract has room for a future decision. Nothing is built. | No |
+
+When a decision is confirmed, the owning spec gets a minor version bump, the item changes Blocked → Baseline, and the AC/tests are written. The Change Control rule in `constitution.md` §6 applies.
+
+### 1.2 ID scheme
+Spec ID remains the slug. Requirement-level IDs use a short code per slice so the traceability matrix stays readable:
+
+| Code | Spec ID (slug) |
+|---|---|
+| SUB | `employee-transfer-request-submission` |
+| ORC | `employee-transfer-stakeholder-orchestration` |
+| TRK | `employee-transfer-status-tracking` |
+| ACT | `employee-transfer-stakeholder-action` (renamed from `…-task-management`; see §6) |
+
+Format: `SUB-SR-01` (spec requirement), `SUB-AC-01` (acceptance criterion), `SUB-TC-01` (test case), `SUB-API-01` (endpoint), `SUB-FS-01` (failure scenario). Cross-cutting security requirements are `SEC-01..`. Full chain: `.ai-context/traceability.md`.
+
+---
+
+## 2. Slice Sequence
+
+| Seq | Code | Spec ID | Business outcome | BRD | Depends on | Baseline coverage |
+|---|---|---|---|---|---|---|
+| 01 | SUB | `employee-transfer-request-submission` | Employee initiates and submits a transfer request | BR-001..007 | — | **High**: capture, optional reason, submit, format/reference validation, duplicate protection. Blocked: eligibility, date rules, concurrency, business validation, status label |
+| 02 | ORC | `employee-transfer-stakeholder-orchestration` | The request's stakeholder actions are recorded so progress can be tracked | BR-010 | SUB | **Low**: action record contract, stakeholder groups, atomicity. Blocked: which actions, when, in what order, integration mechanism |
+| 03 | TRK | `employee-transfer-status-tracking` | Employee sees status and pending actions in one view | BR-008, BR-009, BR-011 | SUB, ORC | **High**: own-request detail, pending actions, own list, access scoping. Blocked: status value set, completion display, stakeholder view, notifications |
+| 04 | ACT | `employee-transfer-stakeholder-action` | A responsible stakeholder records the outcome of their action | BR-010 | ORC | **Low**: state integrity, attribution, requester cannot act. Blocked: who is responsible, outcome values, effect on the request |
+
+```text
+BRD-001 v2.1 ──► SUB (01) ──► ORC (02) ──┬──► TRK (03)  read path
+                                          └──► ACT (04)  write path ──(runtime data)──► TRK
+```
+
+TRK and ACT can be built in either order. Both depend only on the ORC stakeholder-action record contract.
+
+---
+
+## 3. Business Decisions → Blocked Items
+
+| BD | Blocks |
+|---|---|
+| BD-001, BD-002, BD-003 | ORC-SR-02; ACT-SR-01 |
+| BD-003, BD-013 | SUB-SR-07 |
+| BD-004, BD-005, BD-006 | ORC-SR-03; ACT-SR-01 |
+| BD-007 | ORC-SR-04; ACT-SR-05; request-level transitions (TRK §State Model) |
+| BD-008 | ACT-SR-02 (outcome values); ACT-SR-05; ORC-SR-05 |
+| BD-009 | SUB-SR-09 (Reserved) |
+| BD-010 | SUB-SR-08 |
+| BD-011 | SUB-SR-06 |
+| BD-012 | TRK-SR-06 (Reserved) |
+| BD-014 | Nothing (non-blocking) |
+| BD-015 | SUB-SR-05 (status value only); TRK-SR-04; TRK-SR-05; ORC-SR-05 |
+| BD-016 | SUB-SR-04 |
+| BD-017 | TRK-SR-03b (stakeholder view); ACT-SR-01; confirmation of BAR-001..005 |
+| BD-018 | ACT-SR-04b (audit content/retention) |
+| BD-019 | ORC-SR-01b (execution mechanism); TD-001 |
+
+---
+
+## 4. Cross-Cutting Security Requirements (technical access control)
+
+These implement the **business authorization rules** in BRD §15.1 using the engineering constraints in `constitution.md` §3. They do not decide who is authorised; they decide how the decision is enforced.
+
+| ID | Requirement | Source | Tag |
+|---|---|---|---|
+| SEC-01 | Every endpoint requires an authenticated portal session. With no session, the endpoint returns 401 and has no side effects. | Constitution §3; TD-002 | Baseline; mechanism Depends on A-001 |
+| SEC-02 | The requesting employee's identity is taken only from the authenticated session. Any `employee_id`/requester field in a payload is ignored and never trusted. | BAR-001 | Baseline |
+| SEC-03 | Authorization is deny-by-default. A caller gets access only if a Baseline rule grants it. | Constitution §3 | Baseline |
+| SEC-04 | Visibility scoping is applied in the data-access/query layer (the query itself filters by permitted caller), not only in the UI or controller. | Constitution §3; BAR-002, BAR-003 | Baseline |
+| SEC-05 | A request or action the caller may not view returns **404 `not_found`**, the same as a non-existent ID, so its existence is not disclosed. | BAR-003 | Baseline |
+| SEC-06 | A request or action the caller may view but may not act on returns **403 `forbidden`** and has no side effects. | BAR-005 | Baseline |
+| SEC-07 | All SQL uses prepared/parameterised statements. | Constitution §3 | Baseline |
+| SEC-08 | Logs and error responses contain no employee PII, stack traces or SQL. Errors return the standard envelope (§5). | Constitution §3 | Baseline |
+| SEC-09 | State-changing endpoints enforce the portal's existing CSRF protection. | Constitution §3 (reuse portal auth) | Depends on A-001 |
+| SEC-10 | All inputs are validated server-side for type, format and length, whatever the UI validates. | Constitution §3 | Baseline |
+
+---
+
+## 5. API Conventions (all slices)
+
+- Base path follows the project's existing routing convention (Constitution §5). Paths below are shown as `/api/...` and may be re-mapped in the Plan without changing contract semantics.
+- JSON request/response; dates `YYYY-MM-DD`; timestamps ISO-8601 with offset.
+- **Error envelope** (every non-2xx):
+  ```json
+  { "error": "string (machine code)", "message": "string (safe, human-readable)", "fields": [ { "field": "string", "code": "string" } ] }
+  ```
+  `fields` is present only for `validation_error`.
+- Standard codes used across slices:
+
+| HTTP | `error` | Meaning |
+|---|---|---|
+| 400 | `validation_error` | Input fails type/format/length/reference validation |
+| 401 | `unauthenticated` | No valid portal session (SEC-01) |
+| 403 | `forbidden` | Visible but not permitted to act (SEC-06) |
+| 403 | `csrf_invalid` | CSRF check failed (SEC-09) |
+| 404 | `not_found` | Does not exist **or** not visible to caller (SEC-05) |
+| 409 | `conflict` | State conflict (e.g., action no longer pending); `message` describes it |
+| 409 | `idempotency_conflict` | Idempotency key reused with a different payload |
+| 500 | `internal_error` | Unexpected failure; no internals disclosed (SEC-08) |
+
+- **Reserved** codes are not implemented until the governing BD is confirmed: `409 active_request_exists` (BD-010), `422 not_eligible` (BD-003/BD-013), `422 effective_date_not_allowed` (BD-011), `422 proposed_value_not_allowed` (BD-016).
+
+---
+
+## 6. Changes from v1.0 (for the Gate 1 reviewer)
+
+| # | Change | Why |
+|---|---|---|
+| 1 | IDs moved from FR1–FR10 / B1–B10 to BRD v2.1 IDs (BR-xxx, BD-xxx, BAR-xxx) | v1 IDs no longer exist in the BRD |
+| 2 | Removed "exactly five tasks, created in parallel" as a normative rule | BD-004..007 are unconfirmed |
+| 3 | Removed "current manager only" | BD-001 is unconfirmed |
+| 4 | Removed "Submitted"/"Completed" as normative status values; `status` is a field whose value set is Blocked (BD-015) | BRD §13 |
+| 5 | "Stakeholder task" → "stakeholder action"; slice 04 renamed `employee-transfer-stakeholder-action` | "Task" implied internal-task orchestration, a removed assumption (BRD §11); integration scope is BD-019 |
+| 6 | Non-visible resources return 404 (previously 403) | SEC-05: avoids disclosing that another employee's request exists |
+| 7 | Added idempotent submission (SUB-SR-10) as technical failure handling, separate from concurrency policy (BD-010) | Gate 1 finding: duplicate submissions |
+| 8 | Gate 2 Reviewer changed from Project Owner to TBD (independent) | status.md governance correction |
+| 9 | The v1.0 "UT08 → AC6" traceability correction is carried forward as ACT-AC-02/ACT-TC-02 | Unchanged intent |

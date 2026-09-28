@@ -1,5 +1,7 @@
 # Spec: Employee Transfer Stakeholder Task Management
 
+> **ARCHIVED (2026-09-28).** Superseded by `../employee-transfer-stakeholder-action.spec.md` v2.0. Kept for history only; not normative.
+
 ## Spec ID
 employee-transfer-stakeholder-task-management
 
