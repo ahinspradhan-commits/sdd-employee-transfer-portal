@@ -39,7 +39,7 @@ An authenticated employee can see, in one view, the current status of each of th
 ### In scope (Baseline)
 - Detail of one of the employee's own requests: submitted values, status, all stakeholder actions with pending flag.
 - A list of the employee's own requests.
-- Access scoping so that only the requester can view (deny-by-default).
+- Access scoping for the requester; additional stakeholder visibility remains blocked until BD-017 confirms who may view.
 
 ### Blocked
 - The status value set and its transitions (BD-015, BD-007, BD-008, BD-009).
@@ -63,14 +63,14 @@ An authenticated employee can see, in one view, the current status of each of th
 
 | ID | Requirement | Trace | Tag |
 |---|---|---|---|
-| TRK-SR-01 | The requesting employee can view one of their requests: request ID, proposed department/location/role (ID and display name), effective date, reason, current status, submitted timestamp. | BR-008, RULE-004 | Baseline (status **value** Blocked, BD-015; display names Depend on A-003) |
+| TRK-SR-01 | The requesting employee can view one of their requests: request ID, proposed department/location/role (ID and display name), effective date, reason, current status, and submitted timestamp. | BR-008, RULE-004 | Baseline for the request/read contract; **status value is Blocked (BD-015)** and display names depend on A-003 |
 | TRK-SR-02 | The same view lists every stakeholder action on the request with its stakeholder group and whether it is pending. The employee can therefore tell which actions are pending and with whom. | BR-009, RULE-005 | Baseline |
-| TRK-SR-03a | Only the requesting employee may view a request. Any other caller gets the same response as for a non-existent request. | BAR-002, BAR-003, SEC-03..05 | Baseline (deny-by-default). BAR-003 confirmation → BD-017 |
+| TRK-SR-03a | The requesting employee may view their own request. A caller without a confirmed access rule receives the same response as for a non-existent request. | BAR-002, SEC-03..05 | Baseline (deny-by-default); stakeholder access is separately blocked by TRK-SR-03b |
 | TRK-SR-03b | Stakeholders may view requests they are involved in. | BAR-004, BD-017 | **Blocked (BD-017, BD-001, BD-004..006)**. Denied by default until confirmed |
 | TRK-SR-04 | Status value set and request-level transitions. | §13, BD-015, BD-007..009 | **Blocked (BD-015 + BD-007..009)** |
 | TRK-SR-05 | Completion is shown to the employee as confirmation that the transfer journey has finished. | §6 Stage 6, BD-015, BD-012 | **Blocked (BD-015)** for the definition; the channel beyond in-portal is Reserved (BD-012) |
 | TRK-SR-06 | Notifications at business events. | §14, BD-012 | **Reserved (BD-012)** |
-| TRK-SR-07 | The employee can list all their own requests, newest first, each showing request ID, status, submitted timestamp and the number of pending actions. | BR-011 | Baseline |
+| TRK-SR-07 | The employee can list all their own requests, newest first, each showing request ID, the employee-visible status when BD-015 is confirmed, submitted timestamp and the number of pending actions. | BR-011 | Baseline for the list contract; **status value Blocked (BD-015)** |
 | TRK-SR-08 | Both views reflect the committed state at read time. Once an ACT outcome is committed, it shows on the next read. | BR-011 | Baseline |
 
 ## 5. State Model — Request (feature-level)
@@ -169,12 +169,12 @@ SEC-01, SEC-03, SEC-04, SEC-05, SEC-07, SEC-08 apply. Slice-specific:
 
 | Test ID | AC | Level | Scenario | Expected |
 |---|---|---|---|---|
-| TRK-TC-01 | TRK-AC-01 | API | Submit (fixture policy {Manager, HR}); GET as requester | 200; fields match; 2 actions, both pending |
+| TRK-TC-01 | TRK-AC-01 | API | Submit (fixture policy {Manager, HR}); GET as requester | 200; request fields match; 2 actions, both pending; no specific status label/value asserted |
 | TRK-TC-02 | TRK-AC-02 | API | Fixture: 3 actions; record outcome on one; GET | `pending_stakeholder_groups` has 2 groups; excludes the completed one |
 | TRK-TC-03 | TRK-AC-02 | Unit | Two HR actions, one pending, one not | `HR` still listed as pending |
-| TRK-TC-04 | TRK-AC-03 | API | Employee B GETs A's request; separately GETs ID 999999 | Both 404; bodies identical |
+| TRK-TC-04 | TRK-AC-03 | API | Employee B, with no confirmed access rule, GETs A's request; separately GETs ID 999999 | Both 404; bodies identical |
 | TRK-TC-05 | TRK-AC-03 | Unit | Repository query as B for A's ID | Returns no row (the filter is in SQL) |
-| TRK-TC-06 | TRK-AC-04 | API | User who is the responsible Manager on the fixture action GETs the request | 404 |
+| TRK-TC-06 | TRK-AC-04 | API | Stakeholder user GETs the request before BD-017 confirms stakeholder visibility | 404 |
 | TRK-TC-07 | TRK-AC-05 | API | A has 2 requests, B has 1; A lists | 2 items, newest first; counts correct |
 | TRK-TC-08 | TRK-AC-06 | API | Employee with none lists | 200 `{ "requests": [] }` |
 | TRK-TC-09 | TRK-AC-07 | API | No session on API-01 and API-02 | 401 each |

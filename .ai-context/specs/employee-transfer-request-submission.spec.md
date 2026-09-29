@@ -82,7 +82,7 @@ An authenticated employee can start an Internal Transfer Request in the One-Poin
 | SUB-SR-02 | The reason is optional. When omitted or blank it is stored as null; when provided it is stored exactly as submitted (after trimming leading and trailing whitespace). | BR-006, RULE-003 | Baseline |
 | SUB-SR-03 | Department, location and role values must reference existing entries in the portal's master data. Effective date must be a valid calendar date in `YYYY-MM-DD` format. Reason, if present, must not exceed the technical storage limit `REASON_MAX_LENGTH`, set in the Plan. | §12 (confirmed capture), SEC-10 | Baseline (technical integrity); master-data reference Depends on A-003 |
 | SUB-SR-04 | Business validation of proposed values (equal to current, inactive values, business length limit on reason). | §12, BD-016 | **Blocked (BD-016)** |
-| SUB-SR-05 | Submitting a valid request creates one persisted request owned by the session employee, records the submission timestamp, and returns the request identifier and current status. | BR-007, BR-008 | Baseline, **except** the status value, which is Blocked (BD-015) |
+| SUB-SR-05 | Submitting a valid request creates one persisted request owned by the session employee, records the submission timestamp, and returns the request identifier. Employee-visible status is provided by the TRK read path and remains blocked by BD-015. | BR-007 | Baseline |
 | SUB-SR-06 | Effective-date business restrictions (past dates, lead time). | §12, BD-011 | **Blocked (BD-011)**. Until confirmed, any valid calendar date is accepted in development builds only; see §11 Note |
 | SUB-SR-07 | Employee / employee-type eligibility to submit. | BD-003, BD-013 | **Blocked (BD-003, BD-013)** |
 | SUB-SR-08 | Policy on multiple active requests per employee. | BD-010 | **Blocked (BD-010)** |
@@ -197,7 +197,7 @@ Level: **API** = HTTP-level test against a real local MySQL test DB with rollbac
 
 | Test ID | AC | Level | Scenario | Expected |
 |---|---|---|---|---|
-| SUB-TC-01 | SUB-AC-01 | API | All required fields valid, no reason | 201; row exists with values; reason null; owner = session employee; `status` non-empty |
+| SUB-TC-01 | SUB-AC-01 | API | All required fields valid, no reason | 201; row exists with values; reason null; owner = session employee; `request_id` and `submitted_at` present |
 | SUB-TC-02 | SUB-AC-01 | Unit | Reason is `"   "` (whitespace only) | Stored as null |
 | SUB-TC-03 | SUB-AC-02 | API | Submit with reason, then GET TRK-API-01 | Returned reason equals trimmed input |
 | SUB-TC-04 | SUB-AC-03 | Unit | Each required field omitted individually (4 cases) | 400; `fields` contains that field with `required` |

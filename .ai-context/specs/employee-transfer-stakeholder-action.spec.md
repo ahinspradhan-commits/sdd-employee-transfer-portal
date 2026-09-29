@@ -65,12 +65,12 @@ This spec therefore defines Baseline **invariants** that hold however BD-019 is 
 | ID | Requirement | Trace | Tag |
 |---|---|---|---|
 | ACT-SR-01 | A stakeholder can see the pending actions for which they are the responsible party. | BR-010, BAR-004 | **Blocked (BD-019 for the portal channel; BD-001, BD-004..006, BD-017 for "responsible")** |
-| ACT-SR-02 | The responsible party can record the outcome of a pending action. | BR-010, BAR-005 | Baseline invariant: only a **pending** action accepts an outcome. **Blocked:** outcome values (BD-008) and portal channel (BD-019) |
+| ACT-SR-02 | The outcome-recording service accepts an outcome only for a pending stakeholder action. Caller authorization and the definition of the responsible party remain decision-gated. | BR-010 | Baseline invariant: only a **pending** action accepts an outcome. **Blocked:** outcome values (BD-008), responsible-party rule (BD-017) and portal channel (BD-019) |
 | ACT-SR-03 | An action that is no longer pending rejects any further outcome and stays unchanged. | Integrity (Constitution §4) | Baseline |
 | ACT-SR-04a | Every recorded outcome stores the authenticated recorder's user ID and a server timestamp. The recorder identity comes from the session or the integration credential, never from the payload. | BAR-006, SEC-02 | Baseline (technical). BAR-006 confirmation via BD-018 |
 | ACT-SR-04b | Audit trail content, history of changes and retention period. | BD-018 | **Blocked (BD-018)** |
 | ACT-SR-05 | The effect of an outcome on other actions and on the request's status. | BD-007, BD-008, ORC-SR-04/05 | **Blocked (BD-007, BD-008)** |
-| ACT-SR-06 | The requesting employee cannot record an outcome on any action of their own request, even if the routing policy names them as responsible. | BAR-005, SEC-03, SEC-06 | Baseline (deny-by-default). BAR-005 confirmation via BD-017 |
+| ACT-SR-06 | The requesting employee cannot record an outcome on any action of their own request, even if the routing policy names them as responsible. | BAR-005, SEC-03, SEC-06 | **Blocked (BD-017)** because BAR-005 is not yet confirmed |
 | ACT-SR-07 | If two outcomes are submitted concurrently for the same pending action, exactly one is committed. The other receives the ACT-SR-03 conflict. | Integrity | Baseline |
 
 ## 4. State Model — Stakeholder Action
@@ -122,7 +122,7 @@ Baseline ACs are verified at **service level** (the outcome-recording service), 
 | ACT-AC-01 | **Given** a pending action and a recorder the routing fixture names as responsible, **when** an outcome is recorded, **then** the action becomes `pending = false`, with the outcome, the recorder's user ID and a server timestamp stored. | ACT-SR-02, ACT-SR-04a | Baseline (outcome value is a fixture) |
 | ACT-AC-02 | **Given** a pending action, **when** a user who is not the responsible party records an outcome, **then** the action is unchanged and the service reports "not permitted". *(Carries forward the v1.0 UT08→AC6 correction.)* | ACT-SR-02, SEC-03 | Baseline |
 | ACT-AC-03 | **Given** an action that already has an outcome, **when** any user records another, **then** it is unchanged and the service reports a conflict. | ACT-SR-03 | Baseline |
-| ACT-AC-04 | **Given** the requesting employee is named as responsible by the fixture, **when** they record an outcome on their own request's action, **then** it is refused and unchanged. | ACT-SR-06, BAR-005 | Baseline |
+| ACT-AC-04 | **Given** the requesting employee is named as responsible by the fixture, **when** they record an outcome on their own request's action, **then** it is refused and unchanged. | ACT-SR-06, BAR-005 | **Blocked (BD-017)**; AC to be finalized when the business authorization rule is confirmed |
 | ACT-AC-05 | **Given** two concurrent outcome submissions on one pending action, **when** both execute, **then** exactly one is stored and the other gets a conflict. | ACT-SR-07 | Baseline |
 | ACT-AC-06 | **Given** a payload that names a different recorder, **when** an outcome is recorded, **then** the stored recorder is the authenticated caller. | ACT-SR-04a, SEC-02 | Baseline |
 | — | Portal list/record endpoints, responsible-party rules, outcome values, downstream effects, audit retention | ACT-SR-01, -04b, -05; ACT-API-01/02 | **Blocked**. AC to be written on BD confirmation |
@@ -134,7 +134,7 @@ Baseline ACs are verified at **service level** (the outcome-recording service), 
 | ACT-TC-01 | ACT-AC-01 | Service + DB | Fixture responsible user records fixture outcome | Row: pending 0, outcome set, `outcome_by_user_id` = caller, `outcome_at` set |
 | ACT-TC-02 | ACT-AC-02 | Service + DB | Unrelated user records outcome | Refused; row unchanged |
 | ACT-TC-03 | ACT-AC-03 | Service + DB | Record twice | Second refused with conflict; first outcome retained |
-| ACT-TC-04 | ACT-AC-04 | Service + DB | Requester named responsible by fixture | Refused; row unchanged |
+| ACT-TC-04 | ACT-AC-04 | Service + DB | Requester named responsible by fixture | **Deferred until BD-017 confirmation** |
 | ACT-TC-05 | ACT-AC-05 | Service + DB | Two DB connections issue the conditional update simultaneously | Exactly one affected row in total; one conflict |
 | ACT-TC-06 | ACT-AC-06 | Service + DB | Payload `outcome_by_user_id` = other user | Stored recorder = session user |
 | ACT-TC-07 | ACT-AC-01 → TRK-AC-08 | API | Record via service, then GET TRK-API-01 | Action shows `pending: false` |
@@ -145,7 +145,7 @@ Baseline ACs are verified at **service level** (the outcome-recording service), 
 - **Decisions:** BD-019 (channel), BD-001/004..006/017 (responsibility), BD-008 (outcomes), BD-007 (effects), BD-018 (audit).
 
 ## 12. Traceability
-BR-010 + BAR-005/006 → ACT-SR-02, -03, -04a, -06, -07 → ACT-AC-01..06 → ACT-TC-01..07. See `.ai-context/traceability.md`.
+BR-010 + BAR-006 → ACT-SR-02, -03, -04a, -07 → ACT-AC-01..03, -05..06 → ACT-TC-01..03, -05..07. ACT-SR-06/ACT-AC-04/ACT-TC-04 remain blocked by BD-017. See `.ai-context/traceability.md`.
 
 ## 13. Definition of Ready
 - [x] Invariants defined independently of the unresolved channel
