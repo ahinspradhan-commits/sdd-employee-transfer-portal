@@ -12,7 +12,7 @@ v2.0 (2026-09-28): re-baselined against BRD-001 v2.1 after Gate 1 review GATE1-B
 |---|---|
 | Project Owner | Ahin Subhra Pradhan |
 | Gate 1 Reviewer | Sourav Kumar Maity |
-| Gate 2 Reviewer | TBD. Must be independent of the implementer (status.md governance correction) |
+| Gate 2 Reviewer | Subhajit Mukherjee (per review metadata; Project Owner confirmation pending) |
 
 ## Parent Feature
 Employee Internal Transfer Digital Journey (One-Point Employee Portal). BRD: `.ai-context/BRD.md#BRD-001` (v2.1).
@@ -105,6 +105,13 @@ These implement the **business authorization rules** in BRD §15.1 using the eng
 | SEC-08 | Logs and error responses contain no employee PII, stack traces or SQL. Errors return the standard envelope (§5). | Constitution §3 | Baseline |
 | SEC-09 | State-changing endpoints enforce the portal's existing CSRF protection. | Constitution §3 (reuse portal auth) | Depends on A-001 |
 | SEC-10 | All inputs are validated server-side for type, format and length, whatever the UI validates. | Constitution §3 | Baseline |
+
+### SEC-09 Acceptance Criterion and Test Case (cross-cutting; draft pending Gate 1)
+
+| ID | Criterion / scenario | Expected result | Trace / status |
+|---|---|---|---|
+| SEC-09-AC-01 | Given a state-changing transfer endpoint, when the request has a missing, invalid, or expired CSRF token according to the existing portal convention, then the request is rejected before any state change. | Safe 403 `csrf_invalid` response; no request/action/outcome data is persisted or changed. | SEC-09; conditional on A-001 validation; Draft Baseline security invariant |
+| SEC-09-TC-01 | Integration/security test submits a state-changing request with missing/invalid CSRF token, then checks database state. | 403 `csrf_invalid`; persisted state unchanged. Repeat with a valid token to ensure the test exercises the portal convention, not a disabled middleware path. | SEC-09-AC-01; run after A-001 is validated |
 
 ---
 

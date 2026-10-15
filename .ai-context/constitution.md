@@ -1,6 +1,8 @@
 # Project Constitution — Employee Internal Transfer
 
-**Status:** Proposed v1.0 — approve before Gate 1.
+**Status:** Proposed v1.1 — approval pending; do not treat as approved until a dated reviewer/owner decision is recorded below.
+
+**Approval record:** Pending. Approver: TBD. Date/evidence: not recorded. Gate 2 review dated 2026-10-13 requested that this constitution be formally approved before Gate 1; no approval is fabricated here.
 
 The Constitution contains engineering constraints. It must not silently decide business workflow behaviour that belongs in the BRD/business-decision register.
 
@@ -15,7 +17,7 @@ The Constitution contains engineering constraints. It must not silently decide b
 - Test-first is mandatory for every state-changing operation.
 - A corresponding automated test must exist and demonstrate RED before implementation of that behaviour.
 - Core workflow/state-transition tests use a real local MySQL test database or an equivalent rollback-isolated database transaction.
-- Minimum coverage floor: 70% line coverage for the transfer module.
+- Minimum coverage floor: 70% line coverage for the transfer module. Rationale: this is a measurable minimum for the assessment scope while preserving a release gate for security-sensitive paths; it is a floor, not a substitute for AC-based coverage or risk-based tests.
 
 ## 3. Security
 - Every state-changing endpoint requires an authenticated session.

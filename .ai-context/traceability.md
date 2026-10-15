@@ -1,6 +1,6 @@
 # Traceability Matrix — Employee Internal Transfer
 
-**Version:** v1.0 (2026-09-28) · **Addresses:** Gate 1 follow-up G1R2-FA-03
+**Version:** v1.1 (2026-10-13) · **Addresses:** Gate 1 follow-up G1R2-FA-03
 **Chain:** Source requirement → BRD (BR / RULE / BAR) → Spec Requirement (SR / SEC) → Acceptance Criterion (AC) → Test Case (TC)
 **Inputs:** `BRD.md` v2.1 · `decisions/business-decision-register.md` v2.0 · `specs/spec-slice-map.md` v2.0 and the four v2.0 slices
 
@@ -44,7 +44,7 @@ Maintenance rule: any change to a BR, BD, SR, AC or TC updates this file in the 
 | §3 query-layer enforcement | SEC-04 | TRK-AC-03, TRK-AC-05 | TRK-TC-05, TRK-TC-07 |
 | §3 prepared statements | SEC-07 | SUB-AC-01 | SUB-TC-16 |
 | §3 no PII in logs | SEC-08 | SUB-AC-10, SUB-AC-11 | SUB-TC-14, SUB-TC-15 |
-| §3 reuse portal auth (CSRF) | SEC-09 | **None yet.** Depends on A-001 (mechanism unknown) | **None yet** |
+| §3 reuse portal auth (CSRF) | SEC-09 | SEC-09-AC-01 (cross-cutting in `specs/spec-slice-map.md`) | SEC-09-TC-01 (in `test_cases/_security.md`; execution depends on A-001) |
 | §3 / input validation | SEC-10 | SUB-AC-03, SUB-AC-04, TRK-AC-01 | SUB-TC-04..08, TRK-TC-11 |
 | §4 data integrity | ORC-SR-06, ACT-SR-03, ACT-SR-07 | ORC-AC-02, ORC-AC-03, ACT-AC-03, ACT-AC-05 | ORC-TC-03, -04; ACT-TC-03, -05 |
 | Failure handling (review finding 7) | SUB-SR-10 | SUB-AC-08, SUB-AC-09 | SUB-TC-12, SUB-TC-13 |
@@ -85,11 +85,11 @@ Maintenance rule: any change to a BR, BD, SR, AC or TC updates this file in the 
 
 | Assumption | Spec items depending on it | Blocks |
 |---|---|---|
-| A-001 portal authentication | SEC-01 mechanism, SEC-09 | Plan; SEC-09 AC/TC |
+| A-001 portal authentication | SEC-01 mechanism, SEC-09 | Plan finalization and execution of SEC-09-TC-01; SEC-09-AC-01/TC-01 are drafted |
 | A-002 employee organisational data | ORC-SR-02 inputs (once BD-001 closes), SUB-SR-04 (once BD-016 closes) | Plan |
 | A-003 master data | SUB-SR-03 reference check, SUB-AC-05, SUB-FS-03/05, TRK-SR-01 names, TRK-FS-01 | Plan; SUB-AC-05 |
 
-## 7. Orphan Check (2026-09-28)
+## 7. Orphan Check (draft inventory, 2026-10-13)
 
 | Check | Result |
 |---|---|
@@ -98,7 +98,7 @@ Maintenance rule: any change to a BR, BD, SR, AC or TC updates this file in the 
 | AC with no TC | None |
 | TC with no AC | None |
 | Baseline item tracing to a **Proposed** BD option | None. Proposed options are not used |
-| SEC requirement with no AC | **SEC-09** (CSRF). Deferred until A-001 is validated. Tracked here as a known gap |
+| SEC requirement with no AC | **None in the draft matrix after adding SEC-09-AC-01**. Runtime verification remains deferred until A-001 is validated; the AC/TC still requires Gate 1 review and execution |
 | Blocked item with no BD | None |
 | Code / tasks | Not started (not permitted before Gate 1 approval) |
 
@@ -106,7 +106,7 @@ Maintenance rule: any change to a BR, BD, SR, AC or TC updates this file in the 
 
 | Stage | Ready? | Blocking items |
 |---|---|---|
-| Gate 1 spec review | **Yes**: Baseline scope is reviewable | — |
+| Gate 1 spec review | **Reviewable, not approved**: Baseline scope can be submitted for reviewer assessment | Feature Specification Gate 1 decision is still pending |
 | Technical Plan | **No** | A-001..003 validation; BD-019 (integration scope, TD-001) |
 | Tasks / test-first for Baseline items | After Gate 1 approval + Plan | As above |
 | Release of the journey | **No** | Every "Yes" in §5 |

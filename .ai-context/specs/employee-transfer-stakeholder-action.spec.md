@@ -15,7 +15,7 @@ v2.0 (2026-09-28): re-baselined against BRD-001 v2.1. Supersedes `employee-trans
 |---|---|
 | Project Owner | Ahin Subhra Pradhan |
 | Gate 1 Reviewer | Sourav Kumar Maity |
-| Gate 2 Reviewer | TBD (independent of implementer) |
+| Gate 2 Reviewer | Subhajit Mukherjee (per review metadata; owner confirmation pending) |
 
 ### Gate 1 Status
 Requested (specification review pending)

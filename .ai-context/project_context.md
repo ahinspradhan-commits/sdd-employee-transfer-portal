@@ -32,7 +32,7 @@ Source Requirement
 |---|---|---|
 | Project Owner | Ahin Subhra Pradhan | Owns delivery and artefacts |
 | Gate 1 Reviewer | Sourav Kumar Maity | Independent peer review |
-| Gate 2 Reviewer | TBD | Must be independent from the implementer |
+| Gate 2 Reviewer | Subhajit Mukherjee (per 2026-10-13 review metadata; Project Owner confirmation pending) | Must be independent from the implementer |
 
 ## Important Boundary
 The source document does not define manager ownership, conditional routing, sequence, rejection, cancellation, concurrency, detailed date rules, notification channels or external integration. These must be explicitly resolved before workflow-dependent behaviour is baselined.
@@ -41,4 +41,6 @@ The source document does not define manager ownership, conditional routing, sequ
 - BRD v2.1 accepted as the business discovery baseline, subject to clarifications (Gate 1 review 2026-09-28). This is not spec approval.
 - Feature Specification re-baselined to v2.0: Baseline items are normative; workflow-dependent items are Blocked on business decisions. Awaiting Gate 1 specification review.
 - No business decision is Confirmed yet; A-001..003 are not yet validated.
-- Plan, tasks, implementation and Gate 2 evidence have not started.
+- Plan v2.2 is a gated draft; the constitution is proposed and awaits approval. Per-slice tasks and test-case inventories exist but are not implementation-authorized.
+- No `src/` implementation, executable `tests/`, RED/GREEN evidence, SAST or dependency-scan evidence is present.
+- Gate 2 review dated 2026-10-13 returned Changes Requested / Not Ready. See `reviews/GATE2-EMP-TRANSFER-2026-10-13.md` and `status.md`.

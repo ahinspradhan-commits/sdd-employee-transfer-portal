@@ -1,6 +1,6 @@
 # Business Decision Register — Employee Internal Transfer
 
-**Version:** v2.0 (2026-09-28): restructured for Gate 1 follow-up G1R2-FA-05
+**Version:** v2.1 (2026-10-13): governance status clarified after Gate 2 readiness review
 **Purpose:** Track every business decision the source requirement leaves open, who owns it, and whether it is confirmed. Workflow-dependent specification items stay **Blocked** until the decision that governs them is **Confirmed** here.
 
 ## Rules
@@ -63,3 +63,9 @@
 | 2026-09-16 | BD-001..014 | Raised in BRD v2.0; proposed options tabled | Ahin Subhra Pradhan (Project Owner) | BRD.md §9 |
 | 2026-09-28 | All | Gate 1 review: decisions to be tracked with owners and confirmation status; not to be converted into implementation rules without approval | Sourav Kumar Maity (Gate 1 Reviewer) | reviews/GATE1-BRD-002-2026-09-28.md |
 | 2026-09-28 | BD-015..019 | Raised from BRD §6, §10, §12, §13, §15, §18 | Project Owner | BRD.md v2.1 §9 |
+
+
+## Gate 2 Review Follow-up (2026-10-13)
+
+- Gate 2 reviewer named in the review metadata: **Subhajit Mukherjee** (`subhajit.mukherjee@intglobal.com`). The Project Owner must confirm this nomination and ensure the reviewer remains independent of the implementer; this register does not substitute for that confirmation.
+- No business decision has been confirmed by this remediation. Named business approvers remain TBD. BD-019 and the other workflow-dependent decisions remain open/proposed and must not be implemented as facts.
