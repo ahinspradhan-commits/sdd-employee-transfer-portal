@@ -107,3 +107,55 @@ Severity: **Blocker** = must be fixed before Gate 2 can be requested. **Major** 
 ## 7. Gate 2 Recommendation (verbatim decision)
 
 **Changes Requested. Not ready for Gate 2.** There is no code to approve. The project may continue with Gate 1 specification review, assumption validation and decision closure. Re-request Gate 2 when the entry conditions in §6 are met. The zip file question in §4 needs an answer from the author.
+
+---
+
+# Re-verification — 2026-10-15
+
+**Reviewed:** commit `07b574d` "Gate2 review correction" (author `ahins.pradhan`) against this review and `GATE2-REMEDIATION-2026-10-13.md`.
+**Result:** **Partially fixed. Gate 2 remains Not Ready.** The document-level findings are mostly resolved. The repository-level findings are not, and a new zip file was committed.
+
+## Important discrepancy
+
+`GATE2-REMEDIATION-2026-10-13.md` says `.gitignore` was added, `.agent/` was populated, the README was made operational, and the BRD backups and ADR stub were removed. **None of this is in the repository.** The remediation was done on an uploaded zip copy, and only the `.ai-context/` document changes were merged. The remediation record therefore overstates what was fixed. Please correct it or apply the missing changes.
+
+## Finding-by-finding
+
+| ID | Status | Verified evidence |
+|---|---|---|
+| G2-01 No implementation or tests | **Open (expected)** | Still no `src/` or `tests/`. Honestly stated in `status.md`. Nothing to fix until Feature Gate 1 passes. |
+| G2-02 No approved spec or constitution | **Open** | `constitution.md` v1.1 says "Approval pending, approver TBD". Specs are still Draft. Not fabricated, which is correct. |
+| G2-03 Gate 2 reviewer | **Partially fixed** | Name now appears in `status.md`, `project_context.md`, the plan and the specs, each with "owner confirmation pending". The Project Owner must confirm the nomination and independence. A reviewer should be nominated by the owner, not copied from the review's own metadata. |
+| G2-04 Plan and tasks before gates | **Fixed (artefact state)** | All tasks in the per-slice files are Pending or Blocked and say "not executable until Feature Gate 1". A-001..A-003 and BD-019 remain open and are shown as open. |
+| G2-05 Constitution check | **Fixed (draft)** | `plans/employee-internal-transfer.plan.md` §11 now has a line-by-line table with evidence and limits. Re-check after the constitution is approved. Note that "No secrets committed" is ticked although no secret scan has run. |
+| G2-06 Task IDs and stub files | **Partially fixed** | Per-slice tasks files with `<slug>.T##` IDs exist. **The stubs are still tracked**: `plans/.plan.md`, `specs/.spec.md`, `tasks/.tasks.md`, `test_cases/.test_cases.md`. `.plan.md` still contains the superseded plan. Delete them. |
+| G2-07 Per-feature test cases | **Fixed** | Four per-slice files, plus `_integration.md` and `_security.md` populated. Inventory only, not executable tests. |
+| G2-08 Stale status files | **Fixed** | `status.md`, `project_context.md` and `architecture.md` (v0.2) are consistent with the plan and tasks. Keep them in step with future changes. |
+| G2-09 SEC-09 AC and TC | **Fixed (draft)** | `SEC-09-AC-01` and `SEC-09-TC-01` are in the slice map, `traceability.md` and `test_cases/_security.md`. Needs Gate 1 review, and execution after A-001. |
+| G2-10 Rate-limit decision | **Fixed as provisional** | Plan §5 has a per-endpoint table. The decision is "reuse existing throttling if present", which defers the question. Accepted for a draft. A-001 must record what the portal actually does. |
+| G2-11 Empty `.agent/` | **Not fixed** | `int-standards.md` is 16 bytes (`# INT Standards`), `auto-log.md` 11 bytes, and the three workflows 24–27 bytes. `.agentignore` is 0 bytes. |
+| G2-12 `.gitignore` | **Not fixed** | `.gitignore` does not exist in the repository. |
+| G2-14 BRD backups | **Not fixed** | `BRD.md_bkp_160926` and `BRD.md_bkp_280926` are still tracked. |
+| G2-15 `Daily_activity_sheet.xlsx` | **Open** | Still tracked. No answer on its purpose or contents. The remediation note says it was "not verifiable", but it is in the repository. |
+| G2-16 README | **Not fixed** | `README.md` is still the 38-byte skeleton (Setup / Run / Deploy headings, no content). |
+| G2-17 ADR stub | **Partially fixed** | `ADR-0001-routing-policy-boundary.md` was added and is good. `ADR-NNNN-.md` is still tracked. |
+| G2-18 Coverage rationale | **Fixed** | One-line rationale added in `constitution.md` §2. |
+
+## Zip file: not resolved, and repeated
+
+- **Fixed:** `emp-internal-transfer.zip` was removed from the working tree in `07b574d`.
+- **New problem:** the same commit adds **`.ai-context.zip`** (98,664 bytes, 48 files). It is a snapshot of `.ai-context/` taken on 2026-10-13. It repeats the problem raised in §4: a duplicate copy of every artefact, including the superseded `.plan.md`, the stub files and the BRD backups. It will go stale at the next change.
+- **Still unanswered:** none of the three questions in §4 was answered. In particular, no explanation was given for committing zips.
+- **History:** the original zip, with its nested `.git/`, remains in history from `94c25bb`. The owner has not decided on a history rewrite. The remediation record acknowledges this.
+- **Required:** `git rm .ai-context.zip`, add `*.zip` to a real `.gitignore`, and send the files to reviewers by branch, PR or tag instead of an archive.
+
+## Re-verification outcome
+
+**Changes Requested (second round).** Do not re-request Gate 2 until:
+
+1. `.ai-context.zip` is removed and `.gitignore` exists (G2-12).
+2. `.agent/` files are populated (G2-11).
+3. The four stub files, the BRD backups and `ADR-NNNN-.md` are removed (G2-06, G2-14, G2-17).
+4. README has real content (G2-16), and the purpose of the activity sheet is confirmed (G2-15).
+5. `GATE2-REMEDIATION-2026-10-13.md` is corrected to match the repository.
+6. The Project Owner confirms the Gate 2 reviewer (G2-03), and the §6 entry conditions are met (G2-01, G2-02).
