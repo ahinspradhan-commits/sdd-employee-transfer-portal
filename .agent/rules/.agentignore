@@ -1,0 +1,13 @@
+# Files agents must not read as context (binary, stale, superseded or personal)
+*.zip
+*.xlsx
+*.xls
+*_bkp_*
+*.bak
+docs/
+.ai-context/specs/archive/
+vendor/
+node_modules/
+coverage/
+.env
+.env.*

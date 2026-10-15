@@ -3,7 +3,29 @@
 **Source review:** `GATE2-EMP-TRANSFER-2026-10-13.md`  
 **Disposition:** Repository-artifact remediation performed; **Gate 2 remains Not Ready**. This record does not claim that a human approval, implementation, test execution, scan, or repository-history rewrite occurred.
 
-## Remediation performed in this bundle
+## Correction — 2026-10-15
+
+The 2026-10-13 table below was written against an uploaded zip copy, and only the `.ai-context/` document changes were merged in `07b574d`. The re-verification in `GATE2-EMP-TRANSFER-2026-10-13.md` (2026-10-15) found that the rows for G2-06 (stubs), G2-11, G2-12, G2-14, G2-16 and G2-17 overstated what was in the repository. Those claims are withdrawn and replaced by the table in this section. From now on a finding is reported as fixed only when the change is in this repository.
+
+| Finding | Repository change on 2026-10-15 | Remaining condition |
+|---|---|---|
+| Zip / G2-12 | `.ai-context.zip` removed with `git rm`. Before removal it was extracted and compared with `.ai-context/`; it held nothing newer than the repository. `.gitignore` added with `*.zip`, other archives, `*_bkp_*`, `*.xlsx`, `.env*`, key files, `vendor/`, coverage. | `emp-internal-transfer.zip` (nested `.git/`) is still in history from `94c25bb`. The owner decides whether to rewrite history. The author must answer review §4 Q1. |
+| G2-06 | Stubs `plans/.plan.md`, `specs/.spec.md`, `tasks/.tasks.md`, `test_cases/.test_cases.md` removed. | — |
+| G2-11 | `.agent/rules/int-standards.md` (PHP/MySQL rules), `auto-log.md`, `workflows/code-review.md`, `generate-plan.md`, `generate-tests.md` and `.agent/rules/.agentignore` populated. | Keep in step with the constitution after approval. |
+| G2-14 | `BRD.md_bkp_160926` and `BRD.md_bkp_280926` removed; git history holds those versions. | — |
+| G2-15 | No change. `Daily_activity_sheet.xlsx` is tracked at the repository root. `*.xlsx` is now ignored, which only stops new files from being added. | Owner confirms purpose and contents, or removes it. |
+| G2-16 | `README.md` rewritten: current state, repository layout, planned setup and test command, explicit "not runnable yet" and deploy notes. | Add real run/deploy steps with the first implemented task. |
+| G2-17 | `decisions/ADR-NNNN-.md` removed; `ADR-0001` retained. | — |
+| G2-05 (secrets line) | Plan §11 "No secrets committed" un-ticked. Only a keyword grep of the working tree was run (no hits); that is not a secrets scan. | Run a proper secrets scan over the working tree and history. |
+| G2-03 | No change. The Gate 2 reviewer name still comes from the review metadata. | The Project Owner nominates the reviewer and confirms independence in a dated record. |
+
+### Answers to review §4 (zip questions)
+
+1. *Why was the zip committed?* — **Author to answer.**
+2. *Is anything in the zip not already in the repo at a newer version?* — For `.ai-context.zip`: no, verified by extract-and-diff on 2026-10-15. For `emp-internal-transfer.zip`: it is a 2026-09-09 snapshot of artefacts that were later superseded; **author to confirm**.
+3. *Why not share outside git or tag a release?* — From now on, work is handed over by branch, PR or tag. `*.zip` is ignored (`.agent/rules/int-standards.md` §6).
+
+## Remediation performed in this bundle (2026-10-13, zip copy — see correction above)
 
 | Finding | Change | Remaining condition |
 |---|---|---|

@@ -1,0 +1,40 @@
+# Archives and snapshots — share artefacts by branch, PR or tag, never as a committed archive
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+
+# Manual backup copies — git history is the backup
+*_bkp_*
+*.bak
+*.orig
+*~
+
+# Personal / office working files
+*.xlsx
+*.xls
+~$*
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+config/local*.php
+
+# Dependencies and build output
+/vendor/
+/node_modules/
+/coverage/
+.phpunit.result.cache
+.phpunit.cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

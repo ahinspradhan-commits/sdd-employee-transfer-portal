@@ -136,7 +136,7 @@ Do not implement or encode as business rules until confirmed: manager ownership/
 | PHPUnit | [x] Aligned | Proposed constitution §2; test foundation is planned, not present. |
 | Test-first for state changes; RED before implementation | [x] Aligned as process | Constitution §2 and plan §8; no RED evidence exists and no code may start before gates. |
 | 70% line-coverage floor | [x] Recorded | Proposed constitution §2 sets 70%; rationale recorded in `constitution.md` §2. No measured coverage exists. |
-| No secrets committed | [x] Aligned as repository rule | `.gitignore`/`.agentignore` and agent rules added; repository-wide secret scan has not been run. |
+| No secrets committed | [ ] Rule in place; not yet evidenced | `.gitignore`, `.agent/rules/.agentignore` and `.agent/rules/int-standards.md` §5 added 2026-10-15. Only a keyword grep of the working tree has been run (no hits). A proper secrets scan of the working tree and history is required before this line can be ticked. |
 | Authorization enforced at data layer | [x] Aligned | Plan §3/§7 and TRK specs require query-level owner filtering; not yet implemented or tested. |
 | Existing portal authentication reused | [x] Aligned, conditional | Plan §3/§7; A-001 remains open, so actual integration is not verified. |
 
