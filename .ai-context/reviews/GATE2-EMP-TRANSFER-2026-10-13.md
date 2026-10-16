@@ -159,3 +159,40 @@ Severity: **Blocker** = must be fixed before Gate 2 can be requested. **Major** 
 4. README has real content (G2-16), and the purpose of the activity sheet is confirmed (G2-15).
 5. `GATE2-REMEDIATION-2026-10-13.md` is corrected to match the repository.
 6. The Project Owner confirms the Gate 2 reviewer (G2-03), and the §6 entry conditions are met (G2-01, G2-02).
+
+---
+
+# Re-verification (round 3) — 2026-10-16
+
+**Reviewed:** commit `7302ee1` "Gate 2 second-round remediation (repository-level findings)", checked against the working tree, not against the remediation record.
+**Result:** **All repository-level findings from round 2 are now fixed.** Gate 2 remains **Not Ready**, because the gating conditions that cannot be fixed by editing files are still open (see the end).
+
+| ID | Status | Verified evidence |
+|---|---|---|
+| G2-06 Stub files | **Fixed** | `plans/.plan.md`, `specs/.spec.md`, `tasks/.tasks.md`, `test_cases/.test_cases.md` are no longer tracked (`git ls-files`). |
+| G2-11 `.agent/` control plane | **Fixed** | `int-standards.md` (PHP/MySQL: gate discipline, test-first, PDO prepared statements, CSRF, rate limits, no PII in logs, commit hygiene), `auto-log.md`, `code-review.md` (entry check, security checklist, scans), `generate-plan.md`, `generate-tests.md` and `.agentignore` (190 bytes) are populated. Content is consistent with the constitution. |
+| G2-12 `.gitignore` | **Fixed** | Present. Ignores `*.zip` and other archives, `*_bkp_*`, `*.xlsx`, secrets and `.env`, vendor and build output. |
+| G2-14 BRD backups | **Fixed** | Both `BRD.md_bkp_*` files are removed from the index. |
+| G2-16 README | **Fixed** | Real content: current state, layout, planned setup, run, test and deploy sections, and contribution rules. It states honestly that there is no code yet. |
+| G2-17 ADR stub | **Fixed** | `ADR-NNNN-.md` is removed. `ADR-0001-routing-policy-boundary.md` remains. |
+| Zip file (§4) | **Fixed in the tree** | `.ai-context.zip` is removed. There are no tracked archives. `.gitignore` and `int-standards.md` §6 prohibit them. |
+| Remediation record | **Fixed** | `GATE2-REMEDIATION-2026-10-13.md` now has a correction and per-finding statuses that match the repository. `auto-log.md` now requires a commit hash or file path as evidence for each "Fixed" claim. Minor: the old 2026-10-13 table is kept at the bottom of that file, and it still says the activity sheet "was not present". It is labelled as the zip-copy record, but could be deleted to avoid confusion. |
+| `status.md` | **Fixed** | Updated in the same commit and shows G2-15 as open. |
+
+## Still open
+
+| ID | Why | Who |
+|---|---|---|
+| G2-15 `Daily_activity_sheet.xlsx` | Still tracked at the repo root. `*.xlsx` in `.gitignore` does not untrack an existing file. No purpose or content confirmation was given. | Owner: confirm it holds no personal or client data, or `git rm` it. |
+| §4 zip questions | Q1 "why was a zip committed?" is still marked "Author to answer". Q2 was answered for `.ai-context.zip` (extract-and-diff, nothing newer). Both zips remain in git history, including the nested `.git/` in the first one. | Author: answer Q1 and confirm the old-zip snapshot is superseded. Owner: decide whether to rewrite history. |
+| G2-03 Gate 2 reviewer | Name still comes from the review metadata. No dated nomination by the Project Owner. | Project Owner. |
+| G2-01 No code or tests | Intentional, gated. | Start only after Feature Gate 1. |
+| G2-02 Approvals | Constitution approval and Feature Specification Gate 1 are still pending. | Authorized approvers and Sourav Kumar Maity. |
+| G2-09, G2-10 follow-ups | `SEC-09-TC-01` and the rate-limit decision depend on A-001..A-003 validation, which has no evidence yet. | Project Owner and portal technical owner. |
+| G2-05 | Constitution check must be repeated once the constitution and specs are approved. | Project Owner. |
+
+## Outcome
+
+**Documentation and repository hygiene: accepted.** Seven of the eight round 2 items are closed with verified evidence, and the remediation record now matches the repository.
+
+**Gate 2: still Not Ready.** There is no code, no RED or GREEN evidence, no scans, and the approval gates are open. Remaining actions: G2-15 (one `git rm` or an explanation), the author's answer to the zip question, the reviewer nomination, then Feature Gate 1 and the §6 entry conditions.
